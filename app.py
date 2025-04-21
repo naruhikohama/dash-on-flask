@@ -1,5 +1,5 @@
 from flask import Flask
-from dash import Dash, html, dcc, callback, Output, Input, page_container
+from dash import Dash, html, dcc, callback, Output, Input, page_container, clientside_callback, State
 import dash_bootstrap_components as dbc
 
 server = Flask(__name__)
@@ -46,7 +46,6 @@ app.layout = html.Div([
 ],
 className="main"
 )
-
 
 if __name__ == '__main__':
     app.run_server(debug=True)
