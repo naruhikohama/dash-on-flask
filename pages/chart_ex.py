@@ -44,38 +44,52 @@ layout = html.Div([
 
     html.Br(),
 
-    dbc.Button(
-        "Gráfico",
+    dbc.Checklist(
+        options=[
+            {"label": "Gráfico 1", "value":1}],
         id="btn-grafico1",
-        color="light",
-        n_clicks=0
+        switch=True,
+        persistence=True,
+        persistence_type='session',
     ),
 
     html.Br(),
 
     dbc.Collapse(
         html.Div([
-            dcc.Graph(id='example-graph', config={'displayModeBar': False}),
+            dcc.Graph(
+                id='example-graph', 
+                style={'height': '25vh', 'width': '80%', 'border-radius': '10px'},
+                config={'displayModeBar': False}),
         ],
         className="outro"),
         id="collapse-grafico1",
-        is_open=False,
+        is_open=True,
     ),
 
     html.Br(),
 
-    html.Div([
-        dcc.Graph(
-            id='example-graph2',
-            figure={
-                'data': [{'x': [1, 2, 3], 'y': [2, 1, 4], 'type': 'line', 'name': 'SF'}],
-                'layout': {
-                    'title': 'Dash Data Visualization'
-                }
-            }
-        )
-    ]),
+    dbc.Accordion(
+        [
+            dbc.AccordionItem(
+                dcc.Graph(
+                    id='example-graph2',
+                    style={'height': '25vh', 'width': '80%', 'border-radius': '10px'},
+                    # config={'displayModeBar': False}
+                ),
+                title="Gráfico 2",
+            ),
+        ], 
+        start_collapsed=True,
+        id="accordion-fig2",
+        always_open=True, 
+        persistence=True,
+        persistence_type='session',
+
+
+    ),
 ])
+
 
 @callback(
     Output("store-df-data", "data"),
@@ -102,18 +116,20 @@ def filter_data(tickers, start_date, end_date):
 
 @callback(
     Output("collapse-grafico1", "is_open"),
-    Input("btn-grafico1", "n_clicks"),
+    Input("btn-grafico1", "value"),
     State("collapse-grafico1", "is_open")
 )
-def toggle_callapse_grafico1(n, is_open):
-    if n:
-        return not is_open
-    return is_open
+def toggle_callapse_grafico1(value, is_open):
+    print(value, is_open)
+    if value == [1]:
+        return True
+    return False
 
 
 @callback(
     Output('example-graph', 'figure'),
-    Input('store-df-data', 'data')
+    Input('store-df-data', 'data'),
+    prevent_initial_call=True
 )
 
 def update_graph(dados):
@@ -131,3 +147,26 @@ def update_graph(dados):
         tickers=tickers
     )
     return fig1
+
+@callback(
+    Output('example-graph2', 'figure'),
+    Input('store-df-data', 'data'),
+    prevent_initial_call=True
+)
+
+def update_graph(dados):
+    if dados is None:
+        return no_update
+    dff = pd.DataFrame(dados)
+    start_date = dff['Date'].min()
+    end_date = dff['Date'].max()
+    tickers = dff['Ticker'].unique().tolist()
+
+    fig1 = finance_line(
+        dff, 
+        start_date=start_date, 
+        end_date=end_date, 
+        tickers=tickers
+    )
+    return fig1
+

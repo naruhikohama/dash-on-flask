@@ -70,7 +70,7 @@ def finance_line(df, start_date = '2020-01-01', end_date = '2025-01-01', tickers
         hoverlabel=dict(
             bgcolor='rgba(255,255,255,0.9)',
             bordercolor='rgba(25,211,66,0.2)',
-            font_size=14,
+            font_size=11,
             font_family='Montserrat, sans-serif'
         ),
         legend=dict(
@@ -82,7 +82,7 @@ def finance_line(df, start_date = '2020-01-01', end_date = '2025-01-01', tickers
             ),
             orientation='h',
             yanchor='top',
-            y=1.1,
+            y=1.15,
             xanchor='left',
             x=0.01,
             entrywidthmode='fraction',
@@ -122,6 +122,7 @@ def finance_line(df, start_date = '2020-01-01', end_date = '2025-01-01', tickers
     # fig.show(config={'displayModeBar': False})
 
     return fig
+
 
 def multiple_line_chart(df, x, y, tickers):
     dft = (
@@ -191,7 +192,7 @@ def multiple_line_chart(df, x, y, tickers):
         hoverlabel=dict(
             bgcolor='rgba(255,255,255,0.9)',
             bordercolor='rgba(25,211,66,0.2)',
-            font_size=14,
+            font_size=12,
             font_family='Montserrat, sans-serif'
         ),
         legend=dict(

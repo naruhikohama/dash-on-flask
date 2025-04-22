@@ -75,3 +75,12 @@ div.main {
   border: 1px solid #dddddd;
   height: 1px;
 }
+
+#btn-grafico1 {
+  margin-bottom: 10px;
+}
+
+#example-graph .hoverlayer .bg {
+  rx: 5px !important;
+  shape-rendering: auto;
+}
