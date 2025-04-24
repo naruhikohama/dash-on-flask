@@ -84,3 +84,47 @@ div.main {
   rx: 5px !important;
   shape-rendering: auto;
 }
+
+.CalendarDay {
+  background-color: rgb(247, 250, 250);
+  border-radius: 5px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 5px 5px 5px #d8d8d8;
+  color: #8d8d8d;
+}
+
+.CalendarDay:hover {
+  background-color: #c9f0d7;
+}
+
+td[aria-label~="Selected."].CalendarDay {
+  background: #a3e6ba !important;
+  color: white !important;
+  border-radius: 5px !important;
+}
+
+td[aria-label~="start"].CalendarDay,
+td[aria-label~="end"].CalendarDay {
+  background: #04af43 !important;
+  color: white !important;
+  border-radius: 5px !important;
+}
+
+.main {
+  margin: 0px 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+#memory-table,
+#memory-table-ag {
+  margin: 30px auto;
+  border-radius: 5px;
+  border: 1px solid #d3d3d3;
+  box-shadow: 5px 5px 5px #d8d8d8;
+  background-color: #ffffff;
+  height: 380px;
+  width: 80%;
+  align-items: center;
+  justify-content: center;
+}

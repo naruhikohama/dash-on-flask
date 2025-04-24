@@ -6,93 +6,128 @@ import pandas as pd
 import polars as pl
 import plotly.express as px
 import logging
+import dash_mantine_components as dmc
 
 from utils import *
 
 dash.register_page(__name__, title='Chart Example', path='/chart_ex')
 
+
+
 df_pl = pl.read_csv("assets/Portfolio_prices.csv")
 
 print(df_pl.head())
 
-layout = html.Div([
-    dcc.Store(id='store-df-data', storage_type='session'),
-    dcc.Store(id='store-date', storage_type='session'),
-    dbc.Row([
-        dbc.Col([
-            dcc.Dropdown(
-                id="select-ticker",
-                options=[{"label": i, "value": i} for i in df_pl['Ticker'].unique()],
-                value=["AAPL", "MS"],
-                multi=True,
-                placeholder="Select Tickers",
-                persistence=True,
-                persistence_type='session'
-            ),
-            dcc.DatePickerRange(
-                id='date-picker-range',
-                min_date_allowed=df_pl['Date'].min(),
-                max_date_allowed=df_pl['Date'].max(),
-                initial_visible_month=df_pl['Date'].max(),
-                start_date=df_pl['Date'].min(),
-                end_date=df_pl['Date'].max(),
-                persistence=True,
-                persistence_type='session'
-            ),
-        ])
-    ]),
-
-    html.Br(),
-
-    dbc.Checklist(
-        options=[
-            {"label": "Gráfico 1", "value":1}],
-        id="btn-grafico1",
-        switch=True,
-        persistence=True,
-        persistence_type='session',
-    ),
-
-    html.Br(),
-
-    dbc.Collapse(
+layout = (
         html.Div([
-            dcc.Graph(
-                id='example-graph', 
-                style={'height': '25vh', 'width': '80%', 'border-radius': '10px'},
-                config={'displayModeBar': False}),
-        ],
-        className="outro"),
-        id="collapse-grafico1",
-        is_open=True,
-    ),
-
-    html.Br(),
-
-    dbc.Accordion(
-        [
-            dbc.AccordionItem(
-                dcc.Graph(
-                    id='example-graph2',
-                    style={'height': '25vh', 'width': '80%', 'border-radius': '10px'},
-                    # config={'displayModeBar': False}
+        dcc.Location(id='url', refresh=False),
+        dcc.Store(id='store-fig1', storage_type='session'),
+        dcc.Store(id='store-date', storage_type='session'),
+        dbc.Row([
+            dbc.Col([
+                dcc.Dropdown(
+                    id="select-ticker",
+                    options=[{"label": i, "value": i} for i in df_pl['Ticker'].unique()],
+                    value=["AAPL", "MS"],
+                    multi=True,
+                    placeholder="Select Tickers",
+                    persistence=True,
+                    persistence_type='session'
                 ),
-                title="Gráfico 2",
-            ),
-        ], 
-        start_collapsed=True,
-        id="accordion-fig2",
-        always_open=True, 
-        persistence=True,
-        persistence_type='session',
+            ]),
+            dbc.Col([
+                dcc.DatePickerRange(
+                    id='date-picker-range',
+                    min_date_allowed=df_pl['Date'].min(),
+                    max_date_allowed=df_pl['Date'].max(),
+                    # initial_visible_month=df_pl['Date'].max(),
+                    start_date=df_pl['Date'].min(),
+                    end_date=df_pl['Date'].max(),
+                    persistence=True,
+                    persistence_type='session'
+                ),
+            ])
+        ]),
+
+        html.Br(),
+
+        dbc.Checklist(
+            options=[
+                {"label": "Gráfico 1", "value":1}],
+            id="btn-grafico1",
+            value=[],
+            switch=True,
+            persistence=True,
+            persistence_type='session',
+        ),
+
+        html.Br(),
+
+        dbc.Collapse(
+            html.Div([
+                dcc.Graph(
+                    id='example-graph', 
+                    style={'height': '25vh', 'width': '80%', 'border-radius': '10px'},
+                    config={'displayModeBar': False}),
+            ],
+            className="outro"),
+            id="collapse-grafico1",
+            # is_open=False,
+        ),
+
+        html.Br(),
+
+        dbc.Accordion(
+            [
+                dbc.AccordionItem(
+                    html.Div([
+                        dbc.Row([
+                            dbc.Col([
+                                dcc.DatePickerSingle(
+                                    id='date-picker-single-start',
+                                    min_date_allowed=df_pl['Date'].min(),
+                                    max_date_allowed=df_pl['Date'].max(),
+                                    initial_visible_month=df_pl['Date'].max(),
+                                    persistence=True,
+                                    persistence_type='session'
+                                )
+                            ]),
+                            dbc.Col([
+                                dcc.DatePickerSingle(
+                                    id='date-picker-single-end',
+                                    min_date_allowed=df_pl['Date'].min(),
+                                    max_date_allowed=df_pl['Date'].max(),
+                                    initial_visible_month=df_pl['Date'].max(),
+                                    persistence=True,
+                                    persistence_type='session'
+                                )
+                            ]),
+                        ]),
+                        html.Br(),
+                        
+                        dcc.Graph(
+                            id='example-graph-2',
+                            style={'height': '25vh', 'width': '80%', 'border-radius': '10px'},
+                            config={'displayModeBar': False}
+                        ),
+                    ]),
+                    title="Gráfico 2",
+                ),
+            ], 
+            start_collapsed=True,
+            id="accordion-fig2",
+            always_open=True, 
+            persistence=True,
+            persistence_type='session',
 
 
-    ),
-])
+        ),
+    ])
+)
 
 
 @callback(
-    Output("store-df-data", "data"),
+    Output("store-df-data-home", "data"),
     Input("select-ticker", "value"),
     Input("date-picker-range", "start_date"),
     Input("date-picker-range", "end_date"),
@@ -120,16 +155,12 @@ def filter_data(tickers, start_date, end_date):
     State("collapse-grafico1", "is_open")
 )
 def toggle_callapse_grafico1(value, is_open):
-    print(value, is_open)
-    if value == [1]:
-        return True
-    return False
+    return value == [1]
 
 
 @callback(
     Output('example-graph', 'figure'),
-    Input('store-df-data', 'data'),
-    prevent_initial_call=True
+    Input('store-df-data-home', 'data'),
 )
 
 def update_graph(dados):
@@ -146,27 +177,28 @@ def update_graph(dados):
         end_date=end_date, 
         tickers=tickers
     )
+    print("UPDATING CHART")
     return fig1
 
 @callback(
-    Output('example-graph2', 'figure'),
-    Input('store-df-data', 'data'),
-    prevent_initial_call=True
+    Output('example-graph-2', 'figure'),
+    Input('store-df-data-home', 'data'),
+    Input('date-picker-single-start', 'date'),
+    Input('date-picker-single-end', 'date'),
 )
-
-def update_graph(dados):
+def update_graph_2(dados, start_date, end_date):
     if dados is None:
         return no_update
     dff = pd.DataFrame(dados)
-    start_date = dff['Date'].min()
-    end_date = dff['Date'].max()
+    start_date = dff['Date'].min() if start_date is None else start_date
+    end_date = dff['Date'].max() if end_date is None else end_date
     tickers = dff['Ticker'].unique().tolist()
 
-    fig1 = finance_line(
+    fig2 = finance_line(
         dff, 
         start_date=start_date, 
         end_date=end_date, 
         tickers=tickers
     )
-    return fig1
-
+    print("UPDATING CHART 2")
+    return fig2

@@ -1,6 +1,7 @@
 from flask import Flask
 from dash import Dash, html, dcc, callback, Output, Input, page_container, clientside_callback, State
 import dash_bootstrap_components as dbc
+import dash_mantine_components as dmc
 
 server = Flask(__name__)
 
@@ -25,6 +26,7 @@ nav_contents =[
 
 
 app.layout = html.Div([
+    dcc.Store(id='store-df-data-home', storage_type='session'),
     dbc.Container(
         [
             dbc.Navbar(
