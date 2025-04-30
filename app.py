@@ -14,7 +14,11 @@ app = Dash(
     use_pages = True, 
     server=server, 
     url_base_pathname='/',
-    external_stylesheets=[dbc.themes.MATERIA],
+    external_stylesheets=[dbc.themes.MATERIA, dmc.styles.DATES],
+    external_scripts=[
+        # "https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.8/dayjs.min.js",
+        # "https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.8/locale/ru.min.js"
+    ],
     suppress_callback_exceptions=True)
 
 nav_contents =[
@@ -27,7 +31,7 @@ nav_contents =[
 
 app.layout = html.Div([
     dcc.Store(id='store-df-data-home', storage_type='session'),
-    dbc.Container(
+    html.Div(
         [
             dbc.Navbar(
                 [
@@ -39,8 +43,10 @@ app.layout = html.Div([
                     ),
                 ],
                 id="navbar",
+                # className="translate-middle",
             ),
-        ]
+        ],
+        className="col-6 start-50",
     ),
     html.Div([], id="horizontal-line"),
     html.Br(),

@@ -1,5 +1,50 @@
 import pandas as pd
 import plotly.express as px
+from datetime import datetime
+import dash_bootstrap_components as dbc
+from dash import html
+import uuid
+
+
+def myCard_collapse(title, children, headsize=None, classcard=None, classbody=None):
+    headsize=4 if headsize is None else headsize
+    sameid=str(uuid.uuid4())
+    if not isinstance(children, list):
+        children=[children]
+    newchildren=[
+        html.Button(className="btn btn-tool btn-sm", 
+                    children=html.I(className="fa fa-minus", id={'type':'collapseicon','id':sameid}), 
+                    style={'position':'absolute','top':'0','right':'0'},
+        id={'type':'collapsebutt','id':sameid}),
+        dbc.Collapse(children, is_open=True, id={"type":'collapsewin','id':sameid})
+    ]
+    if title is None:
+        cardbody=newchildren
+    else:
+        cardbody=[dynH(title, headsize, className="card-title")] + newchildren
+    
+    return dbc.Card(dbc.CardBody(cardbody, className=classbody), className=classcard)
+
+def dynH(children, headsize, className=None):
+    if headsize==1:
+        return html.H1(children, className=className)
+    elif headsize==2:
+        return html.H2(children, className=className)
+    elif headsize==3:
+        return html.H3(children, className=className)
+    elif headsize==4:
+        return html.H4(children, className=className)
+    elif headsize==5:
+        return html.H5(children, className=className)
+    elif headsize==6:
+        return html.H6(children, className=className)
+    else:
+        raise ValueError("headsize must be 1-6")
+
+
+
+def convert_to_date(date_str):
+    return datetime.strptime(date_str, '%Y-%m-%d').date()
 
 def finance_line(df, start_date = '2020-01-01', end_date = '2025-01-01', tickers=['AAPL']):
     dft = (
@@ -82,11 +127,11 @@ def finance_line(df, start_date = '2020-01-01', end_date = '2025-01-01', tickers
             ),
             orientation='h',
             yanchor='top',
-            y=1.15,
+            y=1.25,
             xanchor='left',
             x=0.01,
-            entrywidthmode='fraction',
-            entrywidth=0.15,
+            # entrywidthmode='fraction',
+            # entrywidth=0.15,
         ),
         margin=dict(
             l=50, 

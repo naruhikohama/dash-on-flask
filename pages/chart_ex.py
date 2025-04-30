@@ -1,12 +1,13 @@
 import dash
 from dash import html, dcc, callback, Input, Output, State, no_update
 import dash_bootstrap_components as dbc
+import dash_mantine_components as dmc
 
 import pandas as pd
 import polars as pl
 import plotly.express as px
 import logging
-import dash_mantine_components as dmc
+from datetime import timedelta
 
 from utils import *
 
@@ -19,109 +20,147 @@ df_pl = pl.read_csv("assets/Portfolio_prices.csv")
 print(df_pl.head())
 
 layout = (
-        html.Div([
-        dcc.Location(id='url', refresh=False),
-        dcc.Store(id='store-fig1', storage_type='session'),
-        dcc.Store(id='store-date', storage_type='session'),
-        dbc.Row([
-            dbc.Col([
-                dcc.Dropdown(
-                    id="select-ticker",
-                    options=[{"label": i, "value": i} for i in df_pl['Ticker'].unique()],
-                    value=["AAPL", "MS"],
-                    multi=True,
-                    placeholder="Select Tickers",
-                    persistence=True,
-                    persistence_type='session'
-                ),
+    html.Div([
+        dbc.Container([
+            dcc.Location(id='url', refresh=False),
+            dcc.Store(id='store-fig1', storage_type='session'),
+            dcc.Store(id='store-date', storage_type='session'),
+            dbc.Row([
+                dbc.Col([
+                    dcc.Dropdown(
+                        id="select-ticker",
+                        options=[{"label": i, "value": i} for i in df_pl['Ticker'].unique()],
+                        value=["AAPL", "MS"],
+                        multi=True,
+                        placeholder="Select Tickers",
+                        persistence=True,
+                        persistence_type='session'
+                    ),
+                ]),
+                dbc.Col([
+                    # dcc.DatePickerRange(
+                    #     id='date-picker-range',
+                    #     min_date_allowed=df_pl['Date'].min(),
+                    #     max_date_allowed=df_pl['Date'].max(),
+                    #     # initial_visible_month=df_pl['Date'].max(),
+                    #     start_date=df_pl['Date'].min(),
+                    #     end_date=df_pl['Date'].max(),
+                    #     display_format='DD-MM-YYYY',
+                    #     persistence=True,
+                    #     persistence_type='session'
+                    # ),
+
+                    dmc.MantineProvider(
+                        dmc.DatePickerInput(
+                            id='date-picker-range',
+                            minDate=df_pl['Date'].min(),
+                            maxDate=df_pl['Date'].max(),
+                            value=[convert_to_date(df_pl['Date'].max()) - timedelta(days = 30), df_pl['Date'].max()],
+                            type = 'range',
+                            valueFormat="DD MMM YYYY",
+                            maw=300,
+                            firstDayOfWeek=0,
+                            weekendDays=[0],
+                            size="md",
+                            persistence=True,
+                            persistence_type='session'
+                        ),
+                    ),
+                ])
             ]),
-            dbc.Col([
-                dcc.DatePickerRange(
-                    id='date-picker-range',
-                    min_date_allowed=df_pl['Date'].min(),
-                    max_date_allowed=df_pl['Date'].max(),
-                    # initial_visible_month=df_pl['Date'].max(),
-                    start_date=df_pl['Date'].min(),
-                    end_date=df_pl['Date'].max(),
-                    persistence=True,
-                    persistence_type='session'
-                ),
-            ])
-        ]),
 
-        html.Br(),
+            html.Br(),
 
-        dbc.Checklist(
-            options=[
-                {"label": "Gráfico 1", "value":1}],
-            id="btn-grafico1",
-            value=[],
-            switch=True,
-            persistence=True,
-            persistence_type='session',
-        ),
+            dbc.Checklist(
+                options=[
+                    {"label": "Gráfico 1", "value":1}],
+                id="btn-grafico1",
+                value=[],
+                switch=True,
+                persistence=True,
+                persistence_type='session',
+            ),
 
-        html.Br(),
+            html.Br(),
 
-        dbc.Collapse(
-            html.Div([
-                dcc.Graph(
-                    id='example-graph', 
-                    style={'height': '25vh', 'width': '80%', 'border-radius': '10px'},
-                    config={'displayModeBar': False}),
-            ],
-            className="outro"),
-            id="collapse-grafico1",
-            # is_open=False,
-        ),
+            dbc.Collapse(
+                html.Div([
+                    dcc.Graph(
+                        id='example-graph', 
+                        style={'height': '25vh', 'width': '80%', 'border-radius': '10px'},
+                        config={'displayModeBar': False}),
+                ],
+                className="outro"),
+                id="collapse-grafico1",
+                # is_open=False,
+            ),
 
-        html.Br(),
+            html.Br(),
 
-        dbc.Accordion(
-            [
-                dbc.AccordionItem(
-                    html.Div([
-                        dbc.Row([
-                            dbc.Col([
-                                dcc.DatePickerSingle(
-                                    id='date-picker-single-start',
-                                    min_date_allowed=df_pl['Date'].min(),
-                                    max_date_allowed=df_pl['Date'].max(),
-                                    initial_visible_month=df_pl['Date'].max(),
-                                    persistence=True,
-                                    persistence_type='session'
-                                )
-                            ]),
-                            dbc.Col([
-                                dcc.DatePickerSingle(
-                                    id='date-picker-single-end',
-                                    min_date_allowed=df_pl['Date'].min(),
-                                    max_date_allowed=df_pl['Date'].max(),
-                                    initial_visible_month=df_pl['Date'].max(),
-                                    persistence=True,
-                                    persistence_type='session'
-                                )
+            dbc.Accordion(
+                [
+                    dbc.AccordionItem(
+                        html.Div([
+                            dbc.Row([
+                                dbc.Col([
+                                        dmc.MantineProvider(
+                                        dmc.DatePickerInput(
+                                            id='date-picker-single-start',
+                                            label="Data inicial",
+                                            minDate=df_pl['Date'].min(),
+                                            maxDate=df_pl['Date'].max(),
+                                            value=df_pl['Date'].min(),
+                                            valueFormat="DD MMM YYYY",
+                                            maw=200,
+                                            firstDayOfWeek=0,
+                                            weekendDays=[0],
+                                            size="md",
+                                            persistence=True,
+                                            persistence_type='session'
+                                        ),
+                                    ),
+                                ]),
+                                dbc.Col([
+                                        dmc.MantineProvider(
+                                        dmc.DatePickerInput(
+                                            id='date-picker-single-end',
+                                            label="Data final",
+                                            minDate=df_pl['Date'].min(),
+                                            maxDate=df_pl['Date'].max(),
+                                            value=df_pl['Date'].max(),
+                                            valueFormat="DD MMM YYYY",
+                                            maw=200,
+                                            firstDayOfWeek=0,
+                                            weekendDays=[0],
+                                            size="md",
+                                            persistence=True,
+                                            persistence_type='session'
+                                        ),
+                                    ),
+                                ]),
+                            ], className="col-4"),
+                            html.Br(),
+                            
+                            html.Div([
+                                dcc.Graph(
+                                    id='example-graph-2',
+                                    # style={'height': '25vh', 'width': '80%', 'border-radius': '10px'},
+                                    config={'displayModeBar': False}
+                                ),
                             ]),
                         ]),
-                        html.Br(),
-                        
-                        dcc.Graph(
-                            id='example-graph-2',
-                            style={'height': '25vh', 'width': '80%', 'border-radius': '10px'},
-                            config={'displayModeBar': False}
-                        ),
-                    ]),
-                    title="Gráfico 2",
-                ),
-            ], 
-            start_collapsed=True,
-            id="accordion-fig2",
-            always_open=True, 
-            persistence=True,
-            persistence_type='session',
+                        title="Gráfico 2",
+                    ),
+                ], 
+                start_collapsed=True,
+                id="accordion-fig2",
+                always_open=True, 
+                persistence=True,
+                persistence_type='session',
 
 
-        ),
+            ),
+        ])
     ])
 )
 
@@ -129,11 +168,9 @@ layout = (
 @callback(
     Output("store-df-data-home", "data"),
     Input("select-ticker", "value"),
-    Input("date-picker-range", "start_date"),
-    Input("date-picker-range", "end_date"),
+    Input("date-picker-range", "value"),
 )
-def filter_data(tickers, start_date, end_date):
-    logging.info(f"Tickers: {tickers}, Start Date: {start_date}, End Date: {end_date}")
+def filter_data(tickers, dates):
     if not tickers:
         raise dash.exceptions.PreventUpdate
             
@@ -141,8 +178,8 @@ def filter_data(tickers, start_date, end_date):
         df_pl
         .filter(
             (pl.col("Ticker").is_in(tickers)) &
-            (pl.col("Date") >= start_date) &
-            (pl.col("Date") <= end_date)
+            (pl.col("Date") >= dates[0]) &
+            (pl.col("Date") <= dates[1])
         )
         .to_pandas()
     )
@@ -182,20 +219,24 @@ def update_graph(dados):
 
 @callback(
     Output('example-graph-2', 'figure'),
-    Input('store-df-data-home', 'data'),
-    Input('date-picker-single-start', 'date'),
-    Input('date-picker-single-end', 'date'),
+    Input("select-ticker", "value"),
+    Input('date-picker-single-start', 'value'),
+    Input('date-picker-single-end', 'value'),
 )
-def update_graph_2(dados, start_date, end_date):
-    if dados is None:
+def update_graph_2(tickers, start_date, end_date):
+    df = (
+        df_pl
+        .filter(
+            (pl.col("Date") >= start_date) &
+            (pl.col("Date") <= end_date) &
+            (pl.col("Ticker").is_in(tickers))
+        )
+        .to_pandas()
+    )
+    if df.empty:
         return no_update
-    dff = pd.DataFrame(dados)
-    start_date = dff['Date'].min() if start_date is None else start_date
-    end_date = dff['Date'].max() if end_date is None else end_date
-    tickers = dff['Ticker'].unique().tolist()
-
     fig2 = finance_line(
-        dff, 
+        df, 
         start_date=start_date, 
         end_date=end_date, 
         tickers=tickers

@@ -1,5 +1,24 @@
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
 
+:root {
+  --mantine-primary-color-filled: #04af43;
+  --input-bd: #04af43;
+  --input-bd-focus: #25d366 !important;
+  --mantine-primary-color-filled-hover: #04af43 !important;
+  --matine-font-family: "Montserrat", sans-serif !important;
+  --mantine-color-text: #636363 !important;
+  --input-font-family: "Montserrat", sans-serif !important;
+}
+
+.ag-theme-alpine {
+  font-family: "Montserrat", sans-serif !important;
+  --ag-alpine-active-color: #04af43 !important;
+  --ag-selected-row-background-color: #f0fff1 !important;
+  --ag-row-hover-color: #f0fff1 !important;
+  --ag-column-hover-color: #f0fff1 !important;
+  --ag-input-focus-border-color: #04af43 !important;
+}
+
 html,
 body {
   margin: 0 0 0 0;
@@ -10,6 +29,10 @@ body {
 
 div.main {
   margin: 0px 10px;
+}
+
+.text {
+  font-family: var(--mantine-font-family) !important;
 }
 
 .nav-link {
@@ -80,17 +103,51 @@ div.main {
   margin-bottom: 10px;
 }
 
-#example-graph .hoverlayer .bg {
+.Select-control {
+  height: 42px !important;
+  border-color: rgb(206, 212, 218) !important;
+}
+
+.hoverlayer .bg {
   rx: 5px !important;
   shape-rendering: auto;
 }
 
+div.Select-value {
+  background-color: rgba(25, 211, 66, 0.08) !important;
+  color: #04af43 !important;
+}
+
+.VirtualizedSelectFocusedOption {
+  background-color: rgba(25, 211, 66, 0.08) !important;
+}
+
+.DateInput_input__focused {
+  border-bottom: 2px solid #25d366 !important;
+}
+
+.CalendarDay__blocked_out_of_range,
+.CalendarDay__blocked_out_of_range:active,
+.CalendarDay__blocked_out_of_range:hover {
+  color: #e7e7e7;
+  background-color: #ffffffff;
+}
+
+button[data-in-range="true"].matine-DatePickerInput-day {
+  background-color: var(--ag-row-hover-color) !important;
+}
+
 .CalendarDay {
-  background-color: rgb(247, 250, 250);
+  background-color: #fafffa;
+  /* color: #c0c0c0 !important; */
   border-radius: 5px;
   border: 1px solid #f0f0f0;
   box-shadow: 5px 5px 5px #d8d8d8;
-  color: #8d8d8d;
+}
+
+.CalendarDay__outside.CalendarDay {
+  background: #ffffff !important;
+  color: #d8d8d8 !important;
 }
 
 .CalendarDay:hover {
@@ -98,7 +155,7 @@ div.main {
 }
 
 td[aria-label~="Selected."].CalendarDay {
-  background: #a3e6ba !important;
+  background: #25d366 !important;
   color: white !important;
   border-radius: 5px !important;
 }
@@ -108,6 +165,16 @@ td[aria-label~="end"].CalendarDay {
   background: #04af43 !important;
   color: white !important;
   border-radius: 5px !important;
+}
+
+td[aria-disable="true"].CalendarDay {
+  background: #f0f0f0 !important;
+  color: #e2e2e2 !important;
+  border-radius: 5px !important;
+}
+
+.mantine-DatePickerInput-input {
+  text-align: center;
 }
 
 .main {
@@ -127,4 +194,15 @@ td[aria-label~="end"].CalendarDay {
   width: 80%;
   align-items: center;
   justify-content: center;
+}
+
+.dash-graph {
+  width: 50%;
+  height: 25vh;
+  margin: 0 auto;
+}
+
+.main-svg {
+  border-radius: 5px;
+  border: 1px solid #d3d3d3 !important;
 }
