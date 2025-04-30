@@ -2,6 +2,8 @@ from flask import Flask
 from dash import Dash, html, dcc, callback, Output, Input, page_container, clientside_callback, State
 import dash_bootstrap_components as dbc
 import dash_mantine_components as dmc
+import pandas as pd
+import polars as pl
 
 server = Flask(__name__)
 
@@ -9,12 +11,18 @@ server = Flask(__name__)
 def index():
     return "Welcome to the Flask app!"
 
+df = pd.read_csv("assets/Portfolio_prices.csv")
+
 app = Dash(
     __name__, 
     use_pages = True, 
     server=server, 
     url_base_pathname='/',
-    external_stylesheets=[dbc.themes.MATERIA, dmc.styles.DATES],
+    external_stylesheets=[
+        dbc.themes.MATERIA, 
+        dmc.styles.DATES,
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+        ],
     external_scripts=[
         # "https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.8/dayjs.min.js",
         # "https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.8/locale/ru.min.js"
@@ -31,6 +39,8 @@ nav_contents =[
 
 app.layout = html.Div([
     dcc.Store(id='store-df-data-home', storage_type='session'),
+    dcc.Store(id='store-original-data-home', storage_type='session', data=df.to_json(orient='records')),
+    dcc.Store(id='store-edited-data-home', storage_type='session'),
     html.Div(
         [
             dbc.Navbar(

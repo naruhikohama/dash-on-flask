@@ -133,10 +133,6 @@ div.Select-value {
   background-color: #ffffffff;
 }
 
-button[data-in-range="true"].matine-DatePickerInput-day {
-  background-color: var(--ag-row-hover-color) !important;
-}
-
 .CalendarDay {
   background-color: #fafffa;
   /* color: #c0c0c0 !important; */
