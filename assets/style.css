@@ -19,6 +19,21 @@
   --ag-input-focus-border-color: #04af43 !important;
 }
 
+form-control:focus,
+[type="email"].form-control:focus,
+[type="password"].form-control:focus,
+[type="tel"].form-control:focus,
+[type="text"].form-control:focus,
+input.form-control:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="password"]:focus,
+input[type="text"]:focus,
+textarea.form-control:focus,
+textarea:focus {
+  box-shadow: inset 0 -2px 0 #04af43;
+}
+
 html,
 body {
   margin: 0 0 0 0;
@@ -106,6 +121,7 @@ div.main {
 .Select-control {
   height: 42px !important;
   border-color: rgb(206, 212, 218) !important;
+  background-color: #ffffff !important;
 }
 
 .hoverlayer .bg {
@@ -113,9 +129,21 @@ div.main {
   shape-rendering: auto;
 }
 
-div.Select-value {
-  background-color: rgba(25, 211, 66, 0.08) !important;
+.Select-value {
   color: #04af43 !important;
+  vertical-align: middle !important;
+}
+
+.Select--multi .Select-value {
+  background-color: rgba(25, 211, 66, 0.03) !important;
+}
+
+.Select--single .Select-value {
+  background-color: white !important;
+}
+
+.Select--single .Select-value-label {
+  line-height: 42px;
 }
 
 .VirtualizedSelectFocusedOption {
@@ -201,4 +229,40 @@ td[aria-disable="true"].CalendarDay {
 .main-svg {
   border-radius: 5px;
   border: 1px solid #d3d3d3 !important;
+}
+
+#icon-container {
+  display: flex;
+  /* transition: all 0.3s ease; */
+  transition-property: background-color, color, transform;
+  transition-duration: 0.1s, 0.3s, 0.5s;
+  transition-timing-function: ease, ease, ease;
+}
+
+/* Estado neutro */
+.icon-neutral {
+  transform: scale(1);
+  opacity: 0.8;
+  color: #8f8f8f;
+  background-color: #8f8f8f;
+  width: 18px;
+  border-radius: 9px;
+}
+
+/* Estado positivo */
+.icon-up {
+  transform: scale(1.2) rotate(180deg);
+  opacity: 1;
+  color: #04af43;
+  width: 18px;
+  border-radius: 9px;
+}
+
+/* Estado negativo */
+.icon-down {
+  transform: scale(1.2) rotate(180deg);
+  opacity: 1;
+  color: #b30133;
+  width: 18px;
+  border-radius: 9px;
 }

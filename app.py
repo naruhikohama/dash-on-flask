@@ -39,7 +39,7 @@ nav_contents =[
 
 app.layout = html.Div([
     dcc.Store(id='store-df-data-home', storage_type='session'),
-    dcc.Store(id='store-original-data-home', storage_type='session', data=df.to_json(orient='records')),
+    dcc.Store(id='store-original-data-home', storage_type='session', data=df.to_dict(orient='records')),
     dcc.Store(id='store-edited-data-home', storage_type='session'),
     html.Div(
         [

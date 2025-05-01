@@ -6,82 +6,86 @@ from dash_iconify import DashIconify
 import logging
 import dash_ag_grid as dag
 import pandas as pd
+import polars as pl
 from utils import *
 
 dash.register_page(__name__, path='/')
 
 layout = html.Div([
-    html.H1('This is our Home page'),
-    html.Div('This is our Home page content.'),
-    html.Br(),
-    dbc.Row([
-        dbc.Col([
-            dcc.Dropdown(
-            id="select-ticker-home",
-            # options=,
-            # value=["AAPL", "MS"],
-            multi=False,
-            placeholder="Select Tickers",
-            persistence=True,
-            persistence_type='session'
-            ),
-        ]),
-        dbc.Col([
-            dmc.MantineProvider(
-                dmc.NumberInput(
-                    id='number-input-home',
-                    suffix='%',
-                    persistence = True,
-                    persistence_type = 'session'
+    dbc.Container([
+        html.H1('This is our Home page'),
+        html.Div('This is our Home page content.'),
+        html.Br(),
+        dbc.Container([
+            dbc.Col([
+                dcc.Dropdown(
+                id="select-ticker-home",
+                # options=,
+                # value=["AAPL", "MS"],
+                multi=False,
+                placeholder="Select Tickers",
+                persistence=True,
+                persistence_type='session'
+                ),
+            ], className="col col-lg-2"),
+            dbc.Col([
+                dmc.MantineProvider([
+                    dmc.NumberInput(
+                        id="number-input-home",
+                        label="",
+                        value=0,
+                        size='md',
+                        step=1,
+                        min=-100,
+                        max=100,
+                        suffix="%",
+                        hideControls=False,
+                        leftSection=html.Div(
+                            DashIconify(icon="ph:circle-fill", width=18, id="dynamic-icon"),
+                            id="icon-container",
+                            className="icon-neutral",
+                        ),
+                        style={"width": 110},
+                    ),
+                ])
+            ], className="col-md-auto"),
+            dbc.Col ([
+                dmc.MantineProvider(
+                    dmc.Button(
+                        children='Atualizar',
+                        id='button-home',
+                        size='md',
+                        rightSection=DashIconify(icon="flat-color-icons:checkmark"),
+                        variant="outline",
+                        color="green"
+                    )
                 )
-            )
-        ]),
-        dbc.Col ([
-            dmc.MantineProvider(
-                dmc.Button(
-                    children='Atualizar',
-                    id='button-home',
-                    rightSection=DashIconify(icon="flat-color-icons:checkmark"),
-                    variant="outline",
-                    color="green"
-                )
-            )
-        ])
+            ], className="col-md-auto"),
+        ], className="row justify-content-md-center"),
+        dag.AgGrid(
+            id='memory-table-ag',
+            defaultColDef={
+                'sortable': True,
+                'filter': True,
+                'resizable': True,
+                'flex': 1,
+            },
+            style={'height': '400px', 'width': '80%'}
+        ),
     ]),
-    dag.AgGrid(
-        id='memory-table-ag',
-        defaultColDef={
-            'sortable': True,
-            'filter': True,
-            'resizable': True,
-            'flex': 1,
-        },
-        style={'height': '400px', 'width': '80%'}
-    ),
-    
-    myCard_collapse(
-        title="Teste Card",
-        children=[
-            html.Div("This is a test card"),
-            html.Div("This is a test card"),
-            html.Div("This is a test card"),
-            html.Div("This is a test card"),
-        ]
-    )
-
 ],
-className="main")
+className="",)
 
 @callback(
     Output('memory-table-ag', 'rowData'),
     Output('memory-table-ag', 'columnDefs'),
     Output('store-edited-data-home', 'data'),
-    Input('button-home', 'n_clicks'),
     Input('store-original-data-home', 'data'),
+    Input('button-home', 'n_clicks'),
     State('select-ticker-home', 'value'),
     State('number-input-home', 'value')
 )
-def update_table_ag(data, n, ticker, factor):
+def update_table_ag(data, n, ticker, fator):
     logging.info(f"Data received in update_table_ag: {data}")
     if data is None:
         raise dash.exceptions.PreventUpdate
@@ -91,18 +95,20 @@ def update_table_ag(data, n, ticker, factor):
     df = (
         df
         .loc[:, ['Date', 'Ticker', 'Close']]
-        .query('Ticker == "ticker"')
+        .query('Ticker == @ticker')
         .assign(
             Close = lambda dff: dff['Close']*fator_correcao
         )
     )
+
+    print(pl.from_pandas(df).head())
 
     columnDefs = [
         {'headerName': 'Date', 'field': 'Date'},
         {'headerName': 'Ticker', 'field': 'Ticker'},
         {'headerName': 'Close', 'field': 'Close'}
     ]
-    return df.to_dict('records'), columnDefs, df.to_dict(orient='records')
+    return df.to_dict(orient='records'), columnDefs, df.to_dict(orient='records')
 
 @callback(
     Output("select-ticker-home", 'options'),
@@ -118,28 +124,15 @@ def update_tickers(data):
     options = [{'label': ticker, 'value': ticker} for ticker in tickers]
     return options
 
-
-clientside_callback("""
-                    function(clicks, is_open) {
-                        if (clicks>0) {
-                            return !is_open;
-                        } else {
-                            throw window.dash_clientside.PreventUpdate;        
-                        }
-                    }""",
-                    Output({"type":'collapsewin','id':MATCH},'is_open'),
-                    Input({'type':'collapsebutt','id':MATCH}, 'n_clicks'),
-                    State({"type":'collapsewin','id':MATCH},'is_open')
-                    )
-    
-clientside_callback("""
-                    function(is_open) {
-                        if (is_open==true) {
-                            return "fa fa-minus";
-                        } else {
-                        return "fa fa-plus";
-                        }
-                    }""",
-                    Output({'type':'collapseicon','id':MATCH}, 'className'),
-                    Input({"type":'collapsewin','id':MATCH},'is_open')
-    )
+@callback(
+    Output("icon-container", "className"),
+    Output("dynamic-icon", "icon"),
+    Input("number-input-home", "value"),
+)
+def update_icon(value):
+    if value is None or value == 0:
+        return "icon-neutral", "line-md:arrow-right-circle" 
+    elif value > 0:
+        return "icon-up", "line-md:arrow-down-circle"
+    else:
+        return "icon-down", "line-md:arrow-up-circle" 
