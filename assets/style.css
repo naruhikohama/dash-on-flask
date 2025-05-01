@@ -8,6 +8,7 @@
   --matine-font-family: "Montserrat", sans-serif !important;
   --mantine-color-text: #636363 !important;
   --input-font-family: "Montserrat", sans-serif !important;
+  --select-input-height: 42px !important;
 }
 
 .ag-theme-alpine {
@@ -119,7 +120,7 @@ div.main {
 }
 
 .Select-control {
-  height: 42px !important;
+  height: var(--select-input-height) !important;
   border-color: rgb(206, 212, 218) !important;
   background-color: #ffffff !important;
 }
@@ -143,7 +144,11 @@ div.main {
 }
 
 .Select--single .Select-value-label {
-  line-height: 42px;
+  line-height: var(--select-input-height);
+}
+
+.Select--single .Select-placeholder {
+  line-height: var(--select-input-height);
 }
 
 .VirtualizedSelectFocusedOption {
@@ -235,13 +240,22 @@ td[aria-disable="true"].CalendarDay {
   display: flex;
   /* transition: all 0.3s ease; */
   transition-property: background-color, color, transform;
-  transition-duration: 0.1s, 0.3s, 0.5s;
+  transition-duration: 0.3s, 0.3s, 0.3s;
   transition-timing-function: ease, ease, ease;
 }
 
 /* Estado neutro */
 .icon-neutral {
   transform: scale(1);
+  opacity: 0.8;
+  color: #8f8f8f;
+  background-color: #8f8f8f;
+  width: 18px;
+  border-radius: 9px;
+}
+
+.icon-down-neutral {
+  transform: scale(1) rotate(90deg);
   opacity: 0.8;
   color: #8f8f8f;
   background-color: #8f8f8f;
@@ -260,7 +274,7 @@ td[aria-disable="true"].CalendarDay {
 
 /* Estado negativo */
 .icon-down {
-  transform: scale(1.2) rotate(180deg);
+  transform: scale(1.2) rotate(-180deg);
   opacity: 1;
   color: #b30133;
   width: 18px;

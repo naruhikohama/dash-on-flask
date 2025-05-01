@@ -8,13 +8,29 @@ import dash_ag_grid as dag
 import pandas as pd
 import polars as pl
 from utils import *
+import time
 
 dash.register_page(__name__, path='/')
 
+df_pl = pl.read_csv("assets/Portfolio_prices.csv")
+
 layout = html.Div([
-    dbc.Container([
-        html.H1('This is our Home page'),
-        html.Div('This is our Home page content.'),
+    html.Div([
+        html.H1('Home Page'),
+        html.Div([
+            # Botão para importar dataframe
+            dmc.MantineProvider(
+                dmc.Button(
+                    children='Importar DataFrame',
+                    id='import-button-home',
+                    size='md',
+                    rightSection=DashIconify(icon="flat-color-icons:checkmark"),
+                    variant="outline",
+                    color="green"
+                )
+            ),
+            html.Div(id='import-output-home', style={'margin-top': '10px'}),
+        ]),
         html.Br(),
         dbc.Container([
             dbc.Col([
@@ -53,7 +69,7 @@ layout = html.Div([
                 dmc.MantineProvider(
                     dmc.Button(
                         children='Atualizar',
-                        id='button-home',
+                        id='btn-home',
                         size='md',
                         rightSection=DashIconify(icon="flat-color-icons:checkmark"),
                         variant="outline",
@@ -76,14 +92,36 @@ layout = html.Div([
 ],
 className="",)
 
+# time.sleep(2)
+
+@callback(
+    Output('store-original-data-home', 'data'),
+    Output('import-output-home', 'children'),
+    Input('import-button-home', 'n_clicks'),
+    prevent_initial_call=True
+)
+def import_dataframe(n_clicks):
+    print("Importando DataFrame...")
+    df = pd.read_csv('assets/Portfolio_prices.csv')
+    df['Date'] = pd.to_datetime(df['Date'])
+    df['Ticker'] = df['Ticker'].astype(str)
+    df = df.loc[:, ['Date', 'Ticker', 'Close']]
+    data = df.to_dict(orient='records')
+    texto = f"DataFrame importado com sucesso! {len(data)} linhas."
+    print(texto)
+    logging.info(texto)
+    return data, texto
+
+
 @callback(
     Output('memory-table-ag', 'rowData'),
     Output('memory-table-ag', 'columnDefs'),
     Output('store-edited-data-home', 'data'),
-    Input('store-original-data-home', 'data'),
-    Input('button-home', 'n_clicks'),
+    Input('store-df-data-home', 'data'),
+    Input('btn-home', 'n_clicks'),
     State('select-ticker-home', 'value'),
-    State('number-input-home', 'value')
+    State('number-input-home', 'value'),
+    prevent_initial_call=True
 )
 def update_table_ag(data, n, ticker, fator):
     logging.info(f"Data received in update_table_ag: {data}")
@@ -128,11 +166,33 @@ def update_tickers(data):
     Output("icon-container", "className"),
     Output("dynamic-icon", "icon"),
     Input("number-input-home", "value"),
+    Input("icon-container", "className"),
 )
-def update_icon(value):
-    if value is None or value == 0:
-        return "icon-neutral", "line-md:arrow-right-circle" 
-    elif value > 0:
-        return "icon-up", "line-md:arrow-down-circle"
-    else:
-        return "icon-down", "line-md:arrow-up-circle" 
+def update_icon(value, classname):
+    print(classname)
+    try:
+        value = int(value)
+        if value is None:
+            return "icon-neutral", "line-md:arrow-right-circle" 
+        elif classname == "icon-neutral" and value > 0:
+            return "icon-up", "line-md:arrow-down-circle"
+        elif classname == "icon-neutral" and value < 0:
+            return "icon-down", "line-md:arrow-up-circle" 
+        elif classname == "icon-down" and value == 0:
+            return "icon-down-neutral", "line-md:arrow-up-circle"
+        elif classname == "icon-up" and value == 0:
+            return "icon-neutral", "line-md:arrow-right-circle" 
+        elif classname == "icon-up" and value < 0:
+            return "icon-down", "line-md:arrow-up-circle" 
+        elif classname in ["icon-down", "icon-down-neutral"] and value > 0:
+            return "icon-up", "line-md:arrow-down-circle"
+        elif value == 0:
+            return "icon-neutral", "line-md:arrow-right-circle" 
+        elif value > 0:
+            return "icon-up", "line-md:arrow-down-circle"
+        elif value < 0:
+            return "icon-down", "line-md:arrow-up-circle"
+        else:
+            return "icon-neutral", "line-md:arrow-right-circle"
+    except ValueError:
+        return "icon-neutral", "line-md:arrow-right-circle"

@@ -4,6 +4,7 @@ import dash_bootstrap_components as dbc
 import dash_mantine_components as dmc
 import pandas as pd
 import polars as pl
+from time import sleep
 
 server = Flask(__name__)
 
@@ -11,7 +12,7 @@ server = Flask(__name__)
 def index():
     return "Welcome to the Flask app!"
 
-df = pd.read_csv("assets/Portfolio_prices.csv")
+sleep(0.5)
 
 app = Dash(
     __name__, 
@@ -39,7 +40,7 @@ nav_contents =[
 
 app.layout = html.Div([
     dcc.Store(id='store-df-data-home', storage_type='session'),
-    dcc.Store(id='store-original-data-home', storage_type='session', data=df.to_dict(orient='records')),
+    dcc.Store(id='store-original-data-home', storage_type='session'),
     dcc.Store(id='store-edited-data-home', storage_type='session'),
     html.Div(
         [

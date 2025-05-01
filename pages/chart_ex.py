@@ -13,11 +13,7 @@ from utils import *
 
 dash.register_page(__name__, title='Chart Example', path='/chart_ex')
 
-
-
 df_pl = pl.read_csv("assets/Portfolio_prices.csv")
-
-print(df_pl.head())
 
 layout = (
     html.Div([
